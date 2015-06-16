@@ -88,22 +88,22 @@
 
   // http://code.google.com/chrome/extensions/manifest.html#permissions
   "permissions": [
-    "bookmarks", // http://code.google.com/chrome/extensions/bookmarks.html
-    "chrome://favicon/",
-    "clipboardRead", // document.execCommand('paste').
-    "clipboardWrite", // document.execCommand('copy' OR 'cut')
-    "contextMenus", // https://developer.chrome.com/extensions/storage
-    "cookies", // http://code.google.com/chrome/extensions/cookies.html
+    //"bookmarks", // http://code.google.com/chrome/extensions/bookmarks.html
+    //"chrome://favicon/",
+    //"clipboardRead", // document.execCommand('paste').
+    //"clipboardWrite", // document.execCommand('copy' OR 'cut')
+    //"contextMenus", // https://developer.chrome.com/extensions/storage
+    //"cookies", // http://code.google.com/chrome/extensions/cookies.html
     "storage", // https://developer.chrome.com/extensions/storage
-    // "experimental", // http://code.google.com/chrome/extensions/dev/experimental.html
-    "geolocation", // http://dev.w3.org/geo/api/spec-source.html
-    "history", // http://code.google.com/chrome/extensions/history.html
+    //"experimental", // http://code.google.com/chrome/extensions/dev/experimental.html
+    //"geolocation", // http://dev.w3.org/geo/api/spec-source.html
+    //"history", // http://code.google.com/chrome/extensions/history.html
     "idle", // http://code.google.com/chrome/extensions/idle.html
-    "management", // http://code.google.com/chrome/extensions/management.html
+    //"management", // http://code.google.com/chrome/extensions/management.html
     "notifications", // code.google.com/chrome/extensions/notifications.html
     "tabs", // http://code.google.com/chrome/extensions/tabs.html +windows.html
-    "tts", // http://code.google.com/chrome/extensions/tts.html
-    "ttsEngine", // http://code.google.com/chrome/extensions/ttsEngine.html
+    //"tts", // http://code.google.com/chrome/extensions/tts.html
+    //"ttsEngine", // http://code.google.com/chrome/extensions/ttsEngine.html
     "unlimitedStorage",
     "<all_urls>"
   ],
@@ -137,16 +137,18 @@
 
   // http://code.google.com/chrome/extensions/background_pages.html */
   "background": {
-    "scripts": ["lib/jquery.min.js", "src/storage.js", "src/background.js"]
+    "scripts": ["lib/jquery.min.js", "src/config.js", "src/storage.js", "src/background.js"]
   },
 
   // http://code.google.com/chrome/extensions/content_scripts.html
+  /*
   "content_scripts": [
     {
-      "matches": ["http://localhost:8000/*"],
-      "js": ["lib/jquery.min.js", "src/storage.js", "src/content.js"]
+      "matches": ["http://localhost/*"],
+      "js": ["lib/jquery.min.js", "src/config.js", "src/storage.js", "src/content.js"]
     }
   ],
+  */
 
   // http://code.google.com/chrome/extensions/npapi.html
   /*

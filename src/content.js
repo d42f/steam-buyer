@@ -1,3 +1,3 @@
-;(function (ctx, $, undef) {
+;(function (cxt, CONFIG, $) {
   //
-})(this, jQuery);
+})(this, this['CONFIG'], jQuery);

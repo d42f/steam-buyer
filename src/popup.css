@@ -5,6 +5,10 @@
   height: 20px;
 }
 
+.b-table {
+  margin-bottom: 0;
+}
+
 .text-left {
   text-align: left !important;
 }

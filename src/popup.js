@@ -1,6 +1,5 @@
-;(function (cxt, $) {
-  var reMarketListings = /\/market\/listings\/([\d]+)\/([\d\w\%]+)/,
-      console = chrome.extension.getBackgroundPage().console;
+;(function (cxt, CONFIG, $) {
+  var console = chrome.extension.getBackgroundPage().console;
 
   cxt.onerror = function myErrorHandler(errorMsg, url, lineNumber) {
     console.log(errorMsg, url, lineNumber);
@@ -27,7 +26,7 @@
         $scope.appendForm = {
           url: undefined
         };
-        var res = reMarketListings.exec(tab.url);
+        var res = CONFIG.reML.exec(tab.url);
         if (res && res[1] && res[2]) {
           $scope.appendForm.url = 'http://steamcommunity.com/market/listings/' + res[1] + '/' + res[2];
         }
@@ -35,8 +34,8 @@
     });
 
     //chrome.storage.sync.clear();
-    chrome.storage.sync.get('steam-buyer', function (o) {
-      o = o['steam-buyer'] || {};
+    chrome.storage.sync.get(CONFIG.STORAGEKEY, function (o) {
+      o = o[CONFIG.STORAGEKEY] || {};
       o.listings = o.listings || [];
       $timeout(function () {
         $scope.storage = o;
@@ -51,11 +50,17 @@
       }
       $timeout(function () {
         $scope.storage.listings.push({
+          $id: new Date().getTime(),
+          $timestamp: new Date().getTime(),
           url: url,
           title: $o.find('.market_listing_item_name:first').text() || url,
-          thumbnail: $o.find('.market_listing_item_img:first').attr('src') || undefined
+          thumbnail: $o.find('.market_listing_item_img:first').attr('src') || undefined,
+          price: undefined,
+          price_label: ''
         });
-        chrome.storage.sync.set({'steam-buyer': $scope.storage});
+        var data = {};
+        data[CONFIG.STORAGEKEY] = $scope.storage;
+        chrome.storage.sync.set(data);
       });
     }      
 
@@ -76,11 +81,23 @@
         })
         .always(function () {
           form.$$buzy = false;
-        });
+        })
+      ;
     };
 
-    $(cxt).on('storage.steam-buyer', function (evt, newValue, oldValue) {
-      console.log('popup.storage.steam-buyer', newValue, oldValue);
+    $(cxt).on('storage.' + CONFIG.STORAGEKEY, function (evt, o) {
+      $timeout(function () {
+        for (var j = $scope.storage.listings.length; j-- > 0;) {
+          var listing = $scope.storage.listings[j];
+          for (var i = o.listings.length; i-- > 0;) {
+            if (listing.$id === o.listings[i].$id) {
+              angular.extend(listing, o.listings[i]);
+              
+              break;
+            }
+          }
+        }
+      });
     });
   });
-})(this, jQuery);
+})(this, this['CONFIG'], jQuery);

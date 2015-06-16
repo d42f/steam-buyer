@@ -1,4 +1,4 @@
-;(function (cxt, $) {
+;(function (cxt, CONFIG, $) {
   var $cxt = $(cxt);
   chrome.storage.onChanged.addListener(function (changes, namespace) {
     for (var key in changes) {
@@ -7,4 +7,4 @@
       }
     }
   });
-})(this, jQuery);
+})(this, this['CONFIG'], jQuery);
