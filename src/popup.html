@@ -8,17 +8,55 @@
     <link rel="stylesheet" href="popup.css">
     <style>
       html, body {
-        width: 640px;
+        width: 800px;
+      }
+      body {
+        padding-top: 10px;
+        padding-bottom: 10px;
       }
     </style>
   </head>
   <body>
-    <div class="wall">
-      <ul>
-        <li ng-repeat="item in items">
-          <pre ng-bind="item | json"></pre>
-        </li>
-      </ul>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-xs-12" ng-if="!appendForm">
+          <div class="b-loader"></div>
+        </div>
+        <div class="col-xs-12" ng-if="appendForm && !appendForm.url">
+          <h4>None steam listing page</h4>
+        </div>
+        <div class="col-xs-12" ng-if="appendForm && appendForm.url">
+          <form name="forms.appendForm" class="form-horizontal" ng-submit="appendSteamListing(forms.appendForm)">
+            <div class="form-group">
+              <label class="col-xs-4 control-label text-left">Append url for watching</label>
+              <div class="col-xs-8">
+                <div class="input-group">
+                  <input type="text" class="form-control" name="url" placeholder="listing url" readonly ng-model="appendForm.url" ng-required>
+                  <span class="input-group-btn">
+                    <button type="submit" class="btn btn-default" ng-disabled="forms.appendForm.$invalid || forms.appendForm.$$buzy"><strong>+</strong></button>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12">
+          <table class="table">
+            <tbody>
+              <tr ng-if="!storage.listings.length">
+                <td>Empty list</td>
+              </tr>
+              <tr ng-repeat="item in storage.listings track by $index">
+                <td width="1%"><img ng-src="{{item.thumbnail}}" width="64" height="64" alt=""></td>
+                <td><a ng-href="{{item.url}}">{{item.title}}</a></td>
+                <td width="1%"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
     <script src="../lib/jquery.min.js"></script>
     <script src="../lib/angular.min.js"></script>
