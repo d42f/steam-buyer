@@ -1,4 +1,4 @@
-;(function (cxt, CONFIG, $) {
+;(function (cxt, CONFIG, common, $) {
   var console = chrome.extension.getBackgroundPage().console;
 
   cxt.onerror = function myErrorHandler(errorMsg, url, lineNumber) {
@@ -20,28 +20,6 @@
       appendForm: undefined
     });
 
-    chrome.tabs.getSelected(null, function (tab) {
-      $timeout(function () {
-        $scope.tab = tab;
-        $scope.appendForm = {
-          url: undefined
-        };
-        var res = CONFIG.reML.exec(tab.url);
-        if (res && res[1] && res[2]) {
-          $scope.appendForm.url = 'http://steamcommunity.com/market/listings/' + res[1] + '/' + res[2];
-        }
-      });
-    });
-
-    //chrome.storage.sync.clear();
-    chrome.storage.sync.get(CONFIG.STORAGEKEY, function (o) {
-      o = o[CONFIG.STORAGEKEY] || {};
-      o.listings = o.listings || [];
-      $timeout(function () {
-        $scope.storage = o;
-      });
-    });
-
     function appendSteamListing (rsp) {
       var url = this.url,
           $o = $(rsp).find('.market_listing_row:first');
@@ -58,9 +36,7 @@
           price: undefined,
           price_label: ''
         });
-        var data = {};
-        data[CONFIG.STORAGEKEY] = $scope.storage;
-        chrome.storage.sync.set(data);
+        common.saveStorage($scope.storage);
       });
     }      
 
@@ -85,6 +61,33 @@
       ;
     };
 
+    $scope.toggle = function () {
+      $scope.storage.isDisabled = !$scope.storage.isDisabled;
+      common.saveStorage($scope.storage);
+    };
+
+    chrome.tabs.getSelected(null, function (tab) {
+      $timeout(function () {
+        $scope.tab = tab;
+        $scope.appendForm = {
+          url: undefined
+        };
+        var res = CONFIG.reML.exec(tab.url);
+        if (res && res[1] && res[2]) {
+          $scope.appendForm.url = 'http://steamcommunity.com/market/listings/' + res[1] + '/' + res[2];
+        }
+      });
+    });
+
+    //chrome.storage.sync.clear();
+    chrome.storage.sync.get(CONFIG.STORAGEKEY, function (o) {
+      o = o[CONFIG.STORAGEKEY] || {};
+      o.listings = o.listings || [];
+      $timeout(function () {
+        $scope.storage = o;
+      });
+    });
+
     $(cxt).on('storage.' + CONFIG.STORAGEKEY, function (evt, o) {
       $timeout(function () {
         for (var j = $scope.storage.listings.length; j-- > 0;) {
@@ -92,7 +95,6 @@
           for (var i = o.listings.length; i-- > 0;) {
             if (listing.$id === o.listings[i].$id) {
               angular.extend(listing, o.listings[i]);
-              
               break;
             }
           }
@@ -100,4 +102,4 @@
       });
     });
   });
-})(this, this['CONFIG'], jQuery);
+})(this, this['CONFIG'], this['common'], jQuery);

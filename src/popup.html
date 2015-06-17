@@ -27,12 +27,20 @@
                 <div class="input-group">
                   <input type="text" class="form-control" name="url" placeholder="listing url" readonly ng-model="appendForm.url" ng-required>
                   <span class="input-group-btn">
-                    <button type="submit" class="btn btn-default" ng-disabled="forms.appendForm.$invalid || forms.appendForm.$$buzy"><strong>+</strong></button>
+                    <button type="submit" class="btn btn-default" ng-disabled="forms.appendForm.$invalid || forms.appendForm.$$buzy"><i class="glyphicon glyphicon-plus"></i></button>
                   </span>
                 </div>
               </div>
             </div>
           </form>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12">
+          <button class="btn btn-default" type="button" ng-click="toggle()">
+            <i class="glyphicon glyphicon-play" ng-if="storage.isDisabled"></i>
+            <i class="glyphicon glyphicon-pause" ng-if="!storage.isDisabled"></i>
+          </button>
         </div>
       </div>
       <div class="row">
@@ -64,6 +72,7 @@
     <script src="../lib/jquery.min.js"></script>
     <script src="../lib/angular.min.js"></script>
     <script src="config.js"></script>
+    <script src="common.js"></script>
     <script src="storage.js"></script>
     <script src="popup.js"></script>
   </body>

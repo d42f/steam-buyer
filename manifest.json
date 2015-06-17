@@ -137,7 +137,7 @@
 
   // http://code.google.com/chrome/extensions/background_pages.html */
   "background": {
-    "scripts": ["lib/jquery.min.js", "src/config.js", "src/storage.js", "src/background.js"]
+    "scripts": ["lib/jquery.min.js", "src/config.js", "src/common.js", "src/storage.js", "src/background.js"]
   },
 
   // http://code.google.com/chrome/extensions/content_scripts.html
@@ -145,7 +145,7 @@
   "content_scripts": [
     {
       "matches": ["http://localhost/*"],
-      "js": ["lib/jquery.min.js", "src/config.js", "src/storage.js", "src/content.js"]
+      "js": ["lib/jquery.min.js", "src/config.js", "src/common.js", "src/storage.js", "src/content.js"]
     }
   ],
   */

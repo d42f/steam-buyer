@@ -1,18 +1,15 @@
-;(function (cxt, CONFIG, $) {
+;(function (cxt, CONFIG, common, $) {
   console.log('background', new Date().getTime());
 
-  var storage = {},
-      observerTimeout;
+  var storage = {};
 
-  function getPrice ($1, $2, $3) {
-    var vals = $1.find('span.market_listing_price:first').text();
-    var valn = parseFloat(vals.replace(',', '.'));
-    if (!valn) {
-      vals = $2.find('span.market_listing_price:first').text();
-      valn = parseFloat(vals.replace(',', '.'));
-    }
-    if (!valn) {
-      vals = $3.find('span.market_listing_price:first').text();
+  function getPrice () {
+    var vals, valn;
+    for (var i = 0, n = arguments.length; i < n; i++) {
+      if (valn) {
+        break;
+      }
+      vals = arguments[i].find('span.market_listing_price:first').text();
       valn = parseFloat(vals.replace(',', '.'));
     }
     return {
@@ -40,6 +37,11 @@
   }
 
   function observer () {
+    if (storage.isDisabled === true) {
+      return undefined;
+    }
+
+    console.log('observer', new Date().getTime());
     var listings = $.isArray(storage.listings) ? storage.listings : [],
         deferreds = [],
         indexes = [];
@@ -55,11 +57,9 @@
         }
       }
       if (hasChanges) {
-        var data = {};
-        data[CONFIG.STORAGEKEY] = storage;
-        chrome.storage.sync.set(data);
+        common.saveStorage(storage);
       }
-      observerTimeout = setTimeout(observer, CONFIG.OBSERVTIMEOUT);
+      setTimeout(observer, CONFIG.OBSERVTIMEOUT);
     });
   }
 
@@ -71,5 +71,8 @@
 
   $(cxt).on('storage.' + CONFIG.STORAGEKEY, function (evt, o) {
     $.extend(storage, o);
+    if (storage.isDisabled !== true) {
+      observer();
+    }
   });
-})(this, this['CONFIG'], jQuery);
+})(this, this['CONFIG'], this['common'], jQuery);
