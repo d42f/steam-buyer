@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
   "name": "Steam-Buyer",
-  "version": "0.2",
-  "description": "Steam-Buyer is a simple application to make purchases in the Steam store. https://github.com/d42f/steam-buyer",
+  "version": "0.3",
+  "description": "Steam-Buyer is a simple application to make purchases in the Steam store.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",

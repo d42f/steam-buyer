@@ -21,23 +21,19 @@
     <div id="page">
       <div class="panel panel-primary">
         <div class="panel-heading">
-          <span>Steam buyer</span>
-          <div class="btn-group btn-group-xs pull-right">
-            <button class="btn btn-default" type="button" ng-click="toggle()">
-              <i class="glyphicon glyphicon-play" ng-if="storage.isDisabled"></i>
-              <i class="glyphicon glyphicon-pause" ng-if="!storage.isDisabled"></i>
-            </button>
-            <button class="btn btn-default" type="button" ng-click="clear()">
-              <i class="glyphicon glyphicon-trash"></i>
-            </button>
-          </div>
-          <div class="btn-group pull-right">
-            <select class="form-control input-sm" ng-model="storage.observTimeout" ng-change="updateSettings()">
-              <option ng-repeat="item in observTimeouts" value="{{item}}" ng-selected="storage.observTimeout === item">{{item / 1000}} sec.</option>
-            </select>
-          </div>
-          <div class="btn-group pull-right">
-            <div class="checkbox"><label><input type="checkbox" ng-model="storage.showNotifications" ng-change="updateSettings()"><span>Show notifications</span></label></div>
+          <div class="form-inline">
+            <div class="form-group pull-left">
+              <label>Steam buyer</label>
+            </div>
+            <div class="form-group">
+              <label>Autocheck by</label>
+              <select class="form-control input-sm" ng-model="storage.observTimeout" ng-change="updateSettings()">
+                <option ng-repeat="item in observTimeouts" value="{{item}}" ng-selected="storage.observTimeout === item">{{!item ? 'off' : item / 1000 +  ' sec'}}</option>
+              </select>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" ng-model="storage.showNotifications" ng-change="updateSettings()"><span>Show notifications</span></label>
+            </div>
           </div>
         </div>
         <div class="panel-body">

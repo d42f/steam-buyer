@@ -23,7 +23,7 @@
   }
 
   function observer () {
-    if (storage.isDisabled === true) {;
+    if (!storage.observTimeout) {;
       return undefined;
     }
     observHandler = undefined;
@@ -50,7 +50,7 @@
         common.saveStorage(storage);
       }
     }).always(function () {
-      if (!observHandler && storage.isDisabled !== true) {
+      if (!observHandler && storage.observTimeout) {
         observHandler = setTimeout(observer, storage.observTimeout);
       }
     });
@@ -61,7 +61,7 @@
     if (storage.showNotifications) {
       common.checkPrice(storage.listings);
     }
-    if (!observHandler && storage.isDisabled !== true) {
+    if (!observHandler && storage.observTimeout) {
       observer();
     }
   });
@@ -71,7 +71,7 @@
     if (storage.showNotifications) {
       common.checkPrice(storage.listings);
     }
-    if (!observHandler && storage.isDisabled !== true) {
+    if (!observHandler && storage.observTimeout) {
       observer();
     }
   });

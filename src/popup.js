@@ -108,11 +108,6 @@
       };
     })();
 
-    $scope.toggle = function () {
-      $scope.storage.isDisabled = !$scope.storage.isDisabled;
-      saveStorage();
-    };
-
     $scope.remove = function (item) {
       var hasChanges = false;
       for (var i = $scope.storage.listings.length; i-- > 0;) {
