@@ -66,7 +66,7 @@
     getStorage: function (storage) {
       storage = storage ? storage[CONFIG.STORAGEKEY] || {} : {};
       storage.listings = storage.listings || [];
-      storage.observTimeout = typeof storage.observTimeout === 'number' ? storage.observTimeout : CONFIG.OBSERVTIMEOUTDEFAULT;
+      storage.observTimeout = isFinite(+storage.observTimeout) ? +storage.observTimeout : CONFIG.OBSERVTIMEOUTDEFAULT;
       storage.showNotifications = typeof storage.showNotifications === 'boolean' ? storage.showNotifications : true;
       return storage;
     },
