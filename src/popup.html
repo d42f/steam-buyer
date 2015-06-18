@@ -7,24 +7,47 @@
     <link rel="stylesheet" href="../lib/bootstrap.min.css">
     <link rel="stylesheet" href="popup.css">
     <style>
-      body {width: 800px; padding-top: 15px;}
+      body {
+        width: 800px;
+      }
+      #page {
+        max-height: 600px;
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
     </style>
   </head>
   <body>
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-xs-12" ng-if="!appendForm">
-          <div class="b-loader"></div>
+    <div id="page">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <span>Steam buyer</span>
+          <div class="btn-group btn-group-xs pull-right">
+            <button class="btn btn-default" type="button" ng-click="toggle()">
+              <i class="glyphicon glyphicon-play" ng-if="storage.isDisabled"></i>
+              <i class="glyphicon glyphicon-pause" ng-if="!storage.isDisabled"></i>
+            </button>
+            <button class="btn btn-default" type="button" ng-click="clear()">
+              <i class="glyphicon glyphicon-trash"></i>
+            </button>
+          </div>
+          <div class="btn-group pull-right">
+            <select class="form-control input-sm" ng-model="storage.observTimeout" ng-change="updateSettings()">
+              <option ng-repeat="item in observTimeouts" value="{{item}}" ng-selected="storage.observTimeout === item">{{item / 1000}} sec.</option>
+            </select>
+          </div>
+          <div class="btn-group pull-right">
+            <div class="checkbox"><label><input type="checkbox" ng-model="storage.showNotifications" ng-change="updateSettings()"><span>Show notifications</span></label></div>
+          </div>
         </div>
-        <div class="col-xs-12" ng-if="appendForm && !appendForm.url">
-          <h4>None steam listing page</h4>
-        </div>
-        <div class="col-xs-12" ng-if="appendForm && appendForm.url">
-          <form name="forms.appendForm" class="form-horizontal" ng-submit="appendSteamListing(forms.appendForm)">
+        <div class="panel-body">
+          <div class="b-loader" ng-if="!appendForm"></div>
+          <div class="text-muted" ng-if="appendForm && !appendForm.url">None steam listing page</div>
+          <form name="forms.appendForm" class="form-horizontal" ng-if="appendForm && appendForm.url" ng-submit="appendSteamListing(forms.appendForm)">
             <div class="form-group">
-              <label class="col-xs-3 control-label text-left">Append url for watching</label>
-              <div class="col-xs-9">
-                <div class="input-group">
+              <label class="col-xs-4 control-label">Append url for watching</label>
+              <div class="col-xs-8">
+                <div class="input-group input-group-sm">
                   <input type="text" class="form-control" name="url" placeholder="listing url" readonly ng-model="appendForm.url" ng-required>
                   <span class="input-group-btn">
                     <button type="submit" class="btn btn-default" ng-disabled="forms.appendForm.$invalid || forms.appendForm.$$buzy"><i class="glyphicon glyphicon-plus"></i></button>
@@ -34,39 +57,37 @@
             </div>
           </form>
         </div>
-      </div>
-      <div class="row">
-        <div class="col-xs-12">
-          <button class="btn btn-default" type="button" ng-click="toggle()">
-            <i class="glyphicon glyphicon-play" ng-if="storage.isDisabled"></i>
-            <i class="glyphicon glyphicon-pause" ng-if="!storage.isDisabled"></i>
-          </button>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-xs-12">
-          <table class="table b-table">
-            <tbody>
-              <tr ng-if="!storage.listings.length">
-                <td>Empty list</td>
-              </tr>
-              <tr ng-repeat="item in storage.listings track by item.$timestamp">
-                <td width="1%">
-                  <img ng-src="{{item.thumbnail}}" width="64" height="64" alt="">
-                </td>
-                <td>
-                  <a ng-href="{{item.url}}"><strong ng-bind="item.title"></strong></a>
-                </td>
-                <td width="1%">
-                  <span class="text-nowrap" ng-bind="item.price_label"></span>
-                </td>
-                <td width="1%">
-                  <button class="btn btn-default">Buy</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <ul class="list-group">
+          <li class="list-group-item">
+            <table class="table">
+              <tbody>
+                <tr ng-if="!storage.listings.length">
+                  <td>Empty list</td>
+                </tr>
+                <tr ng-repeat="item in storage.listings track by item.$timestamp" ng-class="{'success': item.price <= item.max_price}" ng-animate-on-change="item.$timestamp">
+                  <td width="1%">
+                    <img ng-src="{{item.thumbnail}}" width="32" height="32" alt="">
+                  </td>
+                  <td>
+                    <a ng-href="{{item.url}}" target="_blank"><strong ng-bind="item.title"></strong></a>
+                  </td>
+                  <td width="90px">
+                    <input class="form-control input-sm" type="text" ng-model="item.max_price" ng-change="changeItemMaxPrice(item)" ng-onlynumbers>
+                  </td>
+                  <td class="text-right" width="1%">
+                    <span class="text-nowrap" ng-bind="item.price_label"></span>
+                  </td>
+                  <td class="text-right" width="90px">
+                    <div class="btn-group btn-group-sm">
+                      <button class="btn btn-default" type="button" ng-click="buy(item)"><i class="glyphicon glyphicon-shopping-cart"></i></button>
+                      <button class="btn btn-default" type="button" ng-click="remove(item)"><i class="glyphicon glyphicon-remove"></i></button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </li>
+        </ul>
       </div>
     </div>
     <script src="../lib/jquery.min.js"></script>

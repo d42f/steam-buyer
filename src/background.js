@@ -1,22 +1,8 @@
 ;(function (cxt, CONFIG, common, $) {
   console.log('background', new Date().getTime());
 
-  var storage = {};
-
-  function getPrice () {
-    var vals, valn;
-    for (var i = 0, n = arguments.length; i < n; i++) {
-      if (valn) {
-        break;
-      }
-      vals = arguments[i].find('span.market_listing_price:first').text();
-      valn = parseFloat(vals.replace(',', '.'));
-    }
-    return {
-      price: valn || undefined,
-      price_label: valn ? vals.replace(/[\n\s]+/g, '') : ''
-    };
-  }
+  var storage = {},
+      observHandler;
 
   function updateListing ($id, rsp) {
     var listings = $.isArray(storage.listings) ? storage.listings : [],
@@ -30,18 +16,19 @@
       return undefined;
     }
     var $o = $(rsp).find('div.market_listing_row'),
-        price = getPrice($($o[0]), $($o[1]), $($o[2]));
+        price = common.getPrice($o[0], $o[1], $o[2]);
     if (price.price !== item.price) {
       return $.extend(item, {$timestamp: new Date().getTime()}, price);
     }
   }
 
   function observer () {
-    if (storage.isDisabled === true) {
+    if (storage.isDisabled === true) {;
       return undefined;
     }
+    observHandler = undefined;
 
-    console.log('observer', new Date().getTime());
+    console.log('observer', new Date().getTime(), storage.observTimeout);
     var listings = $.isArray(storage.listings) ? storage.listings : [],
         deferreds = [],
         indexes = [];
@@ -57,21 +44,34 @@
         }
       }
       if (hasChanges) {
+        if (storage.showNotifications) {
+          common.checkPrice(storage.listings);
+        }
         common.saveStorage(storage);
       }
-      setTimeout(observer, CONFIG.OBSERVTIMEOUT);
+    }).always(function () {
+      if (!observHandler && storage.isDisabled !== true) {
+        observHandler = setTimeout(observer, storage.observTimeout);
+      }
     });
   }
 
   chrome.storage.sync.get(CONFIG.STORAGEKEY, function (o) {
-    storage = o[CONFIG.STORAGEKEY] || {};
-    storage.listings = storage.listings || [];
-    observer();
+    storage = common.getStorage(o);
+    if (storage.showNotifications) {
+      common.checkPrice(storage.listings);
+    }
+    if (!observHandler && storage.isDisabled !== true) {
+      observer();
+    }
   });
 
   $(cxt).on('storage.' + CONFIG.STORAGEKEY, function (evt, o) {
-    $.extend(storage, o);
-    if (storage.isDisabled !== true) {
+    common.extendStorage(storage, o);
+    if (storage.showNotifications) {
+      common.checkPrice(storage.listings);
+    }
+    if (!observHandler && storage.isDisabled !== true) {
       observer();
     }
   });

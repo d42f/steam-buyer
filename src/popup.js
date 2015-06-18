@@ -1,42 +1,74 @@
 ;(function (cxt, CONFIG, common, $) {
-  var console = chrome.extension.getBackgroundPage().console;
-
   cxt.onerror = function myErrorHandler(errorMsg, url, lineNumber) {
     console.log(errorMsg, url, lineNumber);
     return false;
   }
 
   angular.module('App', [])
-  .factory('factoryName', function () {
-      return {
-          name: 'factoryName'
-      };
+  .directive('ngAnimateOnChange', function ($timeout) {
+    return function (scope, el, attr) {
+      scope.$on('$destroy', scope.$watch(attr.ngAnimateOnChange, function (nv, ov) {
+        if (nv == ov) {
+          return undefined;
+        }
+        el.addClass('ng-change');
+        $timeout(function () {
+          el.removeClass('ng-change');
+        }, CONFIG.HIGHLIGHTTIMEOUT);
+      }));
+    };
   })
-  .controller('AppCtrl', function ($scope, $timeout, factoryName) {
+  .directive('ngOnlynumbers', function () {
+    function onkeypress (evt) {
+      if (evt.keyCode === 46) {
+        if (String(evt.target.value).indexOf('.') !== -1) {
+          evt.preventDefault();
+        }
+        return undefined;
+      }
+      if (evt.keyCode < 48 || evt.keyCode > 57) {
+        evt.preventDefault();
+      }
+    }
+
+    return function (scope, el, attr) {
+      el.on('keypress', onkeypress);
+      scope.$on('$destroy', function () {
+        el.off('keypress', onkeypress);
+      });
+    };
+  })
+  .controller('AppCtrl', function ($scope, $timeout) {
     console.log('popup', new Date().getTime(), $scope);
 
     angular.extend($scope, {
       forms: {},
-      appendForm: undefined
+      appendForm: undefined,
+      observTimeouts: CONFIG.OBSERVTIMEOUTS
     });
+
+    function saveStorage () {
+      common.saveStorage($scope.storage);
+    }
 
     function appendSteamListing (rsp) {
       var url = this.url,
-          $o = $(rsp).find('.market_listing_row:first');
+          $page = $(rsp),
+          $o = $page.find('.market_listing_row');
       if (!$o.length) {
         return undefined;
       }
       $timeout(function () {
-        $scope.storage.listings.push({
+        $scope.storage.listings.push(angular.extend({
           $id: new Date().getTime(),
           $timestamp: new Date().getTime(),
           url: url,
-          title: $o.find('.market_listing_item_name:first').text() || url,
-          thumbnail: $o.find('.market_listing_item_img:first').attr('src') || undefined,
+          thumbnail: $page.find('div.market_listing_largeimage:first img').attr('src') || undefined,
+          title: $o.filter(':first').find('.market_listing_item_name:first').text() || url,
           price: undefined,
           price_label: ''
-        });
-        common.saveStorage($scope.storage);
+        }, common.getPrice($o[0], $o[1], $o[2])));
+        saveStorage();
       });
     }      
 
@@ -61,9 +93,46 @@
       ;
     };
 
+    $scope.updateSettings = function () {
+      console.log($scope.storage);
+      saveStorage();
+    };
+
+    $scope.changeItemMaxPrice = (function () {
+      var timeout;
+      return function (item) {
+        if (!parseFloat(item.max_price)) {
+          item.max_price = '';
+        }
+        clearTimeout(timeout);
+        timeout = setTimeout(saveStorage, 1000);
+      };
+    })();
+
     $scope.toggle = function () {
       $scope.storage.isDisabled = !$scope.storage.isDisabled;
-      common.saveStorage($scope.storage);
+      saveStorage();
+    };
+
+    $scope.remove = function (item) {
+      var hasChanges = false;
+      for (var i = $scope.storage.listings.length; i-- > 0;) {
+        if ($scope.storage.listings[i].$id === item.$id) {
+          hasChanges = true;
+          $scope.storage.listings.splice(i, 1);
+        }
+      }
+      if (hasChanges) {
+        saveStorage();
+      }
+    };
+
+    $scope.buy = function (item) {
+      //
+    };
+
+    $scope.clear = function () {
+      chrome.storage.sync.clear();
     };
 
     chrome.tabs.getSelected(null, function (tab) {
@@ -79,26 +148,15 @@
       });
     });
 
-    //chrome.storage.sync.clear();
     chrome.storage.sync.get(CONFIG.STORAGEKEY, function (o) {
-      o = o[CONFIG.STORAGEKEY] || {};
-      o.listings = o.listings || [];
       $timeout(function () {
-        $scope.storage = o;
+        $scope.storage = common.getStorage(o);
       });
     });
 
     $(cxt).on('storage.' + CONFIG.STORAGEKEY, function (evt, o) {
       $timeout(function () {
-        for (var j = $scope.storage.listings.length; j-- > 0;) {
-          var listing = $scope.storage.listings[j];
-          for (var i = o.listings.length; i-- > 0;) {
-            if (listing.$id === o.listings[i].$id) {
-              angular.extend(listing, o.listings[i]);
-              break;
-            }
-          }
-        }
+        common.extendStorage($scope.storage, o);
       });
     });
   });
