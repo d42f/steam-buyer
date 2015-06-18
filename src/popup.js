@@ -94,7 +94,6 @@
     };
 
     $scope.updateSettings = function () {
-      console.log($scope.storage);
       saveStorage();
     };
 

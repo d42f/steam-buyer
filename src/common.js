@@ -32,9 +32,8 @@
         }
         if ($.isArray(o[key])) {
           storage[key] = $.isArray(storage[key]) ? storage[key] : [];
-          var a1 = storage[key], a2 = o[key];
-          for (var j = a2.length; j-- > 0;) {
-            var i;
+          var a1 = storage[key], a2 = o[key], i, j;
+          for (j = a2.length; j-- > 0;) {
             for (i = a1.length; i-- > 0;) {
               if (a1[i].$id === a2[j].$id) {
                 $.extend(a1[i], a2[j]);
@@ -43,6 +42,16 @@
             }
             if (i === -1) {
               a1.push(a2[j]);
+            }
+          }
+          for (j = a1.length; j-- > 0;) {
+            for (i = a2.length; i-- > 0;) {
+              if (a2[i].$id === a1[j].$id) {
+                break;
+              }
+            }
+            if (i === -1) {
+              a1.splice(j, 1);
             }
           }
           continue;
@@ -56,7 +65,6 @@
     },
     getStorage: function (storage) {
       storage = storage ? storage[CONFIG.STORAGEKEY] || {} : {};
-      console.log(storage, storage.showNotifications);
       storage.listings = storage.listings || [];
       storage.observTimeout = storage.observTimeout || CONFIG.OBSERVTIMEOUTDEFAULT;
       storage.showNotifications = typeof storage.showNotifications === 'boolean' ? storage.showNotifications : true;
@@ -85,7 +93,7 @@
       listings = $.isArray(listings) ? listings : [listings];
       for (var i = 0, n = listings.length; i < n; i++) {
         var item = listings[i];
-        if (item.price && item.price <= item.max_price) {
+        if (item.price && +item.price <= +item.max_price) {
           common.showNotification(item);
         } else {
           common.hideNotification(item);
