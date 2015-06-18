@@ -7,11 +7,11 @@
       }
       notifications[item.$id] = new Notification('Steam Buyer', {
         icon: item.thumbnail,
-        body: 'Hey! Current price ' + item.price
+        body: 'Hey! Current price ' + item.price_label
       });
       $.extend(notifications[item.$id], {
         onclick: function () {
-          window.open(item.url);      
+          window.open(item.url);
         },
         onclose: function () {
           notifications[item.$id] = undefined;
