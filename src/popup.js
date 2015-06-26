@@ -1,7 +1,7 @@
 ;(function (cxt, CONFIG, common, $) {
+  var background = chrome.extension.getBackgroundPage();
   cxt.onerror = function myErrorHandler(errorMsg, url, lineNumber) {
-    console.log(errorMsg, url, lineNumber);
-    return false;
+    background.console.log(errorMsg, url, lineNumber);
   }
 
   angular.module('App', [])
@@ -38,10 +38,14 @@
       });
     };
   })
-  .controller('AppCtrl', function ($scope, $timeout) {
+  .controller('AppCtrl', function ($scope, $interval, $timeout) {
     console.log('popup', new Date().getTime(), $scope);
 
     angular.extend($scope, {
+      bg: {
+        value: 0,
+        interval: 0
+      },
       forms: {},
       appendForm: undefined,
       observTimeouts: CONFIG.OBSERVTIMEOUTS
@@ -129,6 +133,16 @@
       chrome.storage.sync.clear();
     };
 
+    $scope.onUpdateConfig = function (evt, o) {
+      $timeout(function () {
+        common.extendStorage($scope.storage, o);
+      });
+    };
+
+    $scope.onDevUpdate = function () {
+      $scope.bg.value = background.$timestamp;
+    };
+
     chrome.tabs.getSelected(null, function (tab) {
       $timeout(function () {
         $scope.tab = tab;
@@ -148,10 +162,16 @@
       });
     });
 
-    $(cxt).on('storage.' + CONFIG.STORAGEKEY, function (evt, o) {
-      $timeout(function () {
-        common.extendStorage($scope.storage, o);
-      });
+    $(cxt).on('storage.' + CONFIG.STORAGEKEY, $scope.onUpdateConfig);
+
+    if (CONFIG.ISDEVMODE) {
+      $scope.onDevUpdate();
+      $scope.bg.interval = $interval($scope.onDevUpdate, 3000);
+    }
+
+    $scope.$on('$destroy', function () {
+      $interval.cancel($scope.bg.interval);
+      $(cxt).off('storage.' + CONFIG.STORAGEKEY, $scope.onUpdateConfig);
     });
   });
 })(this, this['CONFIG'], this['common'], jQuery);

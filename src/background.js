@@ -28,7 +28,8 @@
     }
     observHandler = undefined;
 
-    console.log('observer', new Date().getTime(), storage.observTimeout);
+    cxt.$timestamp = new Date().getTime() + ' - ' + storage.observTimeout;
+    console.log('observer', cxt.$timestamp);
     var listings = $.isArray(storage.listings) ? storage.listings : [],
         deferreds = [],
         indexes = [];
