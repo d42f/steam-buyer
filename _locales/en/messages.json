@@ -1,9 +1,29 @@
-/* http://code.google.com/chrome/extensions/i18n.html */
-
-/* An Example String */
 {
-  "hello_string": {
-    "message": "Greetings, elf!",
-    "description": "Shown when the app loads"
+  "off": {
+    "message": "off"
+  },
+  "sec": {
+    "message": "sec"
+  },
+  "Autocheck_by": {
+    "message": "Autocheck by"
+  },
+  "Show_notifications": {
+    "message": "Show notifications"
+  },
+  "None_steam_listing_page": {
+    "message": "None steam listing page"
+  },
+  "Append_url_for_watching": {
+    "message": "Append url for watching"
+  },
+  "listing_url": {
+    "message": "listing url"
+  },
+  "Empty_list": {
+    "message": "Empty list"
+  },
+  "Hey__Current_price": {
+    "message": "Hey! Current price"
   }
 }

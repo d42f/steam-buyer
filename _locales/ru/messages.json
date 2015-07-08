@@ -1,0 +1,29 @@
+{
+  "off": {
+    "message": "выкл"
+  },
+  "sec": {
+    "message": "сек"
+  },
+  "Autocheck_by": {
+    "message": "Обновлять через"
+  },
+  "Show_notifications": {
+    "message": "Показывать оповещения"
+  },
+  "None_steam_listing_page": {
+    "message": "Добавьте ссылки на предметы в Steam"
+  },
+  "Append_url_for_watching": {
+    "message": "Добавьте ссылку"
+  },
+  "listing_url": {
+    "message": "Ссылка для наблюдения"
+  },
+  "Empty_list": {
+    "message": "Пустой список"
+  },
+  "Hey__Current_price": {
+    "message": "Ура! Текущая цена"
+  }
+}

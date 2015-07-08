@@ -1,13 +1,17 @@
 ;(function (cxt, CONFIG, $) {
   var notifications = {};
   var common = {
+    translate: function (str) {
+      var key = String(str).replace(/\W/g, '_');
+      return chrome.i18n.getMessage(key) || str;
+    },
     showNotification: function (item) {
       if (notifications[item.$id]) {
         return undefined;
       }
       notifications[item.$id] = new Notification('Steam Buyer', {
         icon: item.thumbnail,
-        body: 'Hey! Current price ' + item.price_label
+        body: common.translate('Hey! Current price') + ' ' + item.price_label
       });
       $.extend(notifications[item.$id], {
         onclick: function () {

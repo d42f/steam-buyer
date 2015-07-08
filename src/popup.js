@@ -5,6 +5,14 @@
   }
 
   angular.module('App', [])
+  .filter('translate', function () {
+    return common.translate;
+  })
+  .directive('translate', function () {
+    return function (scope, el, attr) {
+      el.text(common.translate(el.text()));
+    };      
+  })
   .directive('ngAnimateOnChange', function ($timeout) {
     return function (scope, el, attr) {
       scope.$on('$destroy', scope.$watch(attr.ngAnimateOnChange, function (nv, ov) {
